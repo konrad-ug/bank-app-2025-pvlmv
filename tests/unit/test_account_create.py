@@ -3,6 +3,10 @@ from src.account import Account, Company_Account, Personal_Account
 
 class TestAccount:
     def test_account_creation(self):
+        acc = Account()
+        assert acc.balance==0
+        acc.transaction(10,1)
+        assert acc.balance==9
         account = Personal_Account("John", "Doe", "00000000000")
         assert account.first_name == "John"
         assert account.last_name == "Doe"
@@ -37,3 +41,5 @@ class TestAccount:
         assert acc.balance==100
         acc.transaction( -10, True )
         assert acc.balance == 85
+        acc2 = Company_Account("Betonex","")
+        assert acc2.nip=="INVALID"
