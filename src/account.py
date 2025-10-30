@@ -36,3 +36,6 @@ class Company_Account(Account):
         price=0
         if express : price=5
         return super().transaction(value,price)
+    
+    def uncovered_method(self):
+        print("I'm off the hook")
