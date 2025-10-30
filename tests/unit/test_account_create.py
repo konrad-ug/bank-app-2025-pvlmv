@@ -5,8 +5,10 @@ class TestAccount:
     def test_account_creation(self):
         acc = Account()
         assert acc.balance==0
+        assert acc.history==[]
         acc.transaction(10,1)
         assert acc.balance==9
+        assert acc.history[-1] == {"value":10,"cost":1}
         account = Personal_Account("John", "Doe", "00000000000")
         assert account.first_name == "John"
         assert account.last_name == "Doe"
