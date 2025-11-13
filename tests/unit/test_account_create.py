@@ -45,3 +45,17 @@ class TestAccount:
         assert acc.balance == 85
         acc2 = Company_Account("Betonex","")
         assert acc2.nip=="INVALID"
+        
+    def test_personal_loan(self):
+        acc = Personal_Account("John", "Doe", "00210100000")
+        acc.transaction( 100 )
+        acc.transaction( 100, True )
+        acc.transaction( 100, True )
+        assert acc.submit_for_loan( 1000 ) == True
+        assert acc.balance == 1300
+        acc.transaction( -10 )
+        assert acc.submit_for_loan( 10 ) == False
+        assert acc.balance == 1300
+        acc.transaction( 100 )
+        assert acc.submit_for_loan( 300 ) == True
+        assert acc.submit_for_loan( 388 ) == False

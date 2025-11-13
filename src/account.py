@@ -1,3 +1,4 @@
+from functools import reduce
 class Account:
     def __init__(self):
         self.balance=0
@@ -26,8 +27,27 @@ class Personal_Account(Account):
     def transaction(self, value, express=False):
         price=0
         if express : price=1
-        return super().transaction(value,price)    
-
+        return super().transaction(value,price)
+    
+    def submit_for_loan( self, value ):
+        if self.history.length < 3 :
+            return False
+        
+        last_three = self.history[-3:]
+        if reduce( lambda acc, val: acc and val > 0, last_three):
+            self.balance+=value
+            return True
+        
+        if self.history.length < 5 :
+            return False
+        
+        sum_of_last_five = reduce( lambda acc, val: acc + val, list( map( lambda x: x.value-x.cost, self.history[-5:] ) ) )
+        if sum_of_last_five >= value:
+            self.balance+=value
+            return True
+        
+        return False
+    
 class Company_Account(Account):
     def __init__( self, company_name, nip):
         if len(nip) == 10 : self.nip=nip
