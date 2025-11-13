@@ -30,19 +30,20 @@ class Personal_Account(Account):
         return super().transaction(value,price)
     
     def submit_for_loan( self, value ):
-        if self.history.length < 3 :
+        if value <= 0: return False
+        if len(self.history) < 3 :
             return False
         
         last_three = self.history[-3:]
-        if reduce( lambda acc, val: acc and val > 0, last_three):
+        if reduce( lambda acc, val: acc and val['value'] > 0, last_three):
             self.balance+=value
             return True
         
-        if self.history.length < 5 :
+        if len(self.history) < 5 :
             return False
         
-        sum_of_last_five = reduce( lambda acc, val: acc + val, list( map( lambda x: x.value-x.cost, self.history[-5:] ) ) )
-        if sum_of_last_five >= value:
+        sum_of_last_five = reduce( lambda acc, val: acc + val, list( map( lambda x: x['value']-x['cost'], self.history[-5:] ) ) )
+        if sum_of_last_five > value:
             self.balance+=value
             return True
         

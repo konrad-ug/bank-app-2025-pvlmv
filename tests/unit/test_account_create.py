@@ -48,14 +48,18 @@ class TestAccount:
         
     def test_personal_loan(self):
         acc = Personal_Account("John", "Doe", "00210100000")
+        assert acc.submit_for_loan(100) == False
         acc.transaction( 100 )
         acc.transaction( 100, True )
         acc.transaction( 100, True )
         assert acc.submit_for_loan( 1000 ) == True
-        assert acc.balance == 1300
+        assert acc.balance == 1298
+        
         acc.transaction( -10 )
-        assert acc.submit_for_loan( 10 ) == False
-        assert acc.balance == 1300
+        assert acc.submit_for_loan( 1 ) == False
+        assert acc.balance == 1288
+        
         acc.transaction( 100 )
         assert acc.submit_for_loan( 300 ) == True
         assert acc.submit_for_loan( 388 ) == False
+        assert acc.submit_for_loan( -20 ) == False
