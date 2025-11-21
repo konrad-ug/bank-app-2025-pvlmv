@@ -8,6 +8,10 @@ class Account:
         if self.balance+value>0:
             self.balance+=(value-price)
             self.history.append({"value":value,"cost":price})
+            
+    def submit_for_loan(self, value):
+        self.balance+=value
+        return True
 
 class Personal_Account(Account):
     def __init__(self, first_name, last_name, pesel, promo_code=None):
@@ -36,16 +40,14 @@ class Personal_Account(Account):
         
         last_three = self.history[-3:]
         if reduce( lambda acc, val: acc and val['value'] > 0, last_three):
-            self.balance+=value
-            return True
+            return super().submit_for_loan(value)
         
         if len(self.history) < 5 :
             return False
         
         sum_of_last_five = reduce( lambda acc, val: acc + val, list( map( lambda x: x['value']-x['cost'], self.history[-5:] ) ) )
         if sum_of_last_five > value:
-            self.balance+=value
-            return True
+            return super().submit_for_loan(value)
         
         return False
     
@@ -61,3 +63,30 @@ class Company_Account(Account):
         price=0
         if express : price=5
         return super().transaction(value,price)
+    
+    def submit_for_loan(self, value):
+        if( value*2 <= self.balance and
+        self.history.__contains__( { 'value':-1775, 'cost':0 } ) ):
+            return super().submit_for_loan(value)
+        else:
+            return False
+        
+        
+class AccountRegisty:
+    def __init__(self):
+        self.accounts = []
+        
+    def add_account(self, account: Personal_Account):
+        self.accounts.append(account)
+        
+    def find( self, pesel ):
+        for acc in self.accounts:
+            if acc.pesel==pesel:
+                return acc
+        return 'none'
+    
+    def access(self):
+        return self.accounts
+    
+    def size(self):
+        return len(self.accounts)
