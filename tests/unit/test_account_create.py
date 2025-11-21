@@ -1,4 +1,4 @@
-from src.account import Account, Company_Account, Personal_Account
+from src.account import Account, Company_Account, Personal_Account, AccountRegisty
 import pytest
 
 class TestAccount:
@@ -48,10 +48,6 @@ class TestAccount:
         betonpol.transaction( -10, True )
         assert betonpol.balance == 85
 
-    @pytest.mark.parametrize( 'test_input,expected', [ ('6032=======', 50), ( '9901=======', 50 ),('6012=======',0) ])
-    def test_personal_promo( self, test_input, expected ):
-        assert Personal_Account("John","Doe",test_input,"PROMO_XYZ").balance == expected
-
     def test_personal_loan( self, john_doe ):
         assert john_doe.submit_for_loan( 100 ) == False
         
@@ -69,3 +65,25 @@ class TestAccount:
         assert john_doe.submit_for_loan( 300 ) == True
         assert john_doe.submit_for_loan( 388 ) == False
         assert john_doe.submit_for_loan( -20 ) == False
+    
+    def test_company_loan( self, betonpol ):
+        assert betonpol.submit_for_loan( 100 ) == False
+        betonpol.transaction( 10000 ) 
+        assert betonpol.submit_for_loan( 100 ) == False
+        betonpol.transaction( -1775 )
+        assert betonpol.submit_for_loan( 100 ) == True
+        assert betonpol.submit_for_loan( 100000 ) == False
+        
+    @pytest.mark.parametrize( 'test_input,expected', [ ('6032=======', 50), ( '9901=======', 50 ),('6012=======',0) ])
+    def test_personal_promo( self, test_input, expected ):
+        assert Personal_Account("John","Doe",test_input,"PROMO_XYZ").balance == expected
+
+    def test_account_registry(self, john_doe):
+        reg = AccountRegisty()
+        assert reg.find(john_doe.pesel)=='none'
+        reg.add_account(john_doe)
+        assert reg.accounts.__contains__(john_doe)
+        assert reg.find(john_doe.pesel)==john_doe
+        assert reg.access() == reg.accounts
+        assert reg.size() == len(reg.accounts)
+        
