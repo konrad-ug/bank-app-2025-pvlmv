@@ -72,9 +72,9 @@ class Company_Account(Account):
             return False
         
         
-class AccountRegisty:
+class AccountRegistry:
     def __init__(self):
-        self.accounts = []
+        self.accounts : list[Personal_Account] = []
         
     def add_account(self, account: Personal_Account):
         self.accounts.append(account)
