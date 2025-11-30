@@ -1,5 +1,7 @@
-from src.account import Account, Company_Account, Personal_Account, AccountRegisty
+from src.account import Account, Company_Account, Personal_Account, AccountRegistry
 import pytest
+
+# python3 -m coverage run --source=src -m pytest ; python3 -m coverage report --fail-under=100
 
 class TestAccount:
     @pytest.fixture
@@ -79,7 +81,7 @@ class TestAccount:
         assert Personal_Account("John","Doe",test_input,"PROMO_XYZ").balance == expected
 
     def test_account_registry(self, john_doe):
-        reg = AccountRegisty()
+        reg = AccountRegistry()
         assert reg.find(john_doe.pesel)=='none'
         reg.add_account(john_doe)
         assert reg.accounts.__contains__(john_doe)
