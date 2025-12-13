@@ -1,7 +1,7 @@
 import pytest
 import requests
 
-# python3 -m coverage run --source=src -m pytest ; python3 -m coverage report --fail-under=100
+# python3 -m coverage run --source=src -m pytest ; python3 -m coverage report
 
 class TestApi:
     url = 'http://127.0.0.1:5000/api/accounts'
@@ -44,7 +44,7 @@ class TestApi:
             'first_name' : acc['first_name'],
             'pesel' : acc['pesel']
         }
-        
+    
     def test_update_account(self,john_doe):
         if( requests.get(self.url+'/count').json()['count'] == 0 ): requests.post( self.url, json = john_doe )
         acc = requests.get(self.url).json()[0]
