@@ -1,6 +1,8 @@
 from flask import Flask, request, jsonify
 from src.account import AccountRegistry, Personal_Account
 
+# python3 -m flask --app app/api.py --debug run
+
 app = Flask(__name__)
 registry = AccountRegistry()
 

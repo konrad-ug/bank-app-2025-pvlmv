@@ -1,4 +1,7 @@
 from functools import reduce
+from datetime import datetime
+import requests
+BANK_APP_MF_URL = 'https://wl-api.mf.gov.pl/api/search/nip/'
 class Account:
     def __init__(self):
         self.balance=0
@@ -52,9 +55,14 @@ class Personal_Account(Account):
         return False
     
 class Company_Account(Account):
-    def __init__( self, company_name, nip):
-        if len(nip) == 10 : self.nip=nip
-        else: self.nip = "INVALID"
+    def __init__( self, company_name, nip, api = requests):
+        res = api.get(BANK_APP_MF_URL+nip+'?date='+datetime.now().strftime('%Y-%m-%d'))
+        if len(nip) < 10:
+            self.nip='INVALID'        
+        elif res.status_code==200 and res.json()['result']['subject']['statusVat']=='Czynny':
+            self.nip=nip
+        else:
+            raise ValueError('Company not registered!')
         self.company_name = company_name
         self.balance = 0
         self.history=[]

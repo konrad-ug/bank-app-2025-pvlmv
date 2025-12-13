@@ -1,7 +1,7 @@
 from src.account import Account, Company_Account, Personal_Account, AccountRegistry
 import pytest
 
-# python3 -m coverage run --source=src -m pytest ; python3 -m coverage report --fail-under=100
+# python3 -m coverage run --source=src -m pytest ; python3 -m coverage report
 
 class TestAccount:
     @pytest.fixture
@@ -9,9 +9,21 @@ class TestAccount:
         return Personal_Account('John','Doe','00210100000','-')
     
     @pytest.fixture
-    def betonpol(self):
-        return Company_Account("Betonpol","0000000000")
+    def mock_api(self, mocker):
+        # Create a mock API client
+        mock_api_client = mocker.Mock()
+        # Mock the response of the API client
+        mock_response = mocker.Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {'result':{'subject':{'statusVat':'Czynny'}}}
+        # Set the mock API client to return the mocked response
+        mock_api_client.get.return_value = mock_response
+        return mock_api_client
     
+    @pytest.fixture
+    def betonpol(self, mock_api):
+        return Company_Account("Betonpol", "8461627563", mock_api)
+  
     def test_account_creation( self ):
         acc = Account()
         assert acc.balance==0
@@ -26,9 +38,9 @@ class TestAccount:
     def test_personal_account_pesel( self, test_input, expected):
         assert Personal_Account('name','surname',test_input).pesel == expected
     
-    @pytest.mark.parametrize( 'test_input,expected', [ ('0021010000', '0021010000'), ( 'not nip', 'INVALID' ) ])
-    def test_company_account_creation( self, test_input, expected ):
-        acc = Company_Account("company",test_input)
+    @pytest.mark.parametrize( 'test_input,expected', [ ('8461627563', '8461627563'), ( 'not nip', 'INVALID' ) ])
+    def test_company_account_creation( self, mock_api, test_input, expected ):
+        acc = Company_Account("company",test_input, mock_api)
         assert acc.company_name == 'company'
         assert acc.nip==expected
        
