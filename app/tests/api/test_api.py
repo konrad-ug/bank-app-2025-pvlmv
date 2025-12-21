@@ -3,7 +3,7 @@ import requests
 
 # python3 -m coverage run --source=src -m pytest ; python3 -m coverage report
 
-class TestApi:
+class TestApi: # pragma: no cover
     url = 'http://127.0.0.1:5000/api/accounts'
     
     @pytest.fixture

@@ -1,5 +1,6 @@
 from functools import reduce
 from datetime import datetime
+from src.smtp.smtp import SMTPClient
 import requests
 BANK_APP_MF_URL = 'https://wl-api.mf.gov.pl/api/search/nip/'
 class Account:
@@ -14,7 +15,17 @@ class Account:
             
     def submit_for_loan(self, value):
         self.balance+=value
-        return True
+        return True      
+    
+    def send_history_via_email( self, email : str, acc_type : str ):
+        if email.__contains__('@') and not email.__contains__(' '):
+            return SMTPClient.send(
+                'Account Transfer History' + str(datetime.now()).split(' ')[0],
+                acc_type + ' account history ' + str(self.history),
+                email
+            )
+        return False
+
 
 class Personal_Account(Account):
     def __init__(self, first_name, last_name, pesel, promo_code=None):
@@ -54,6 +65,9 @@ class Personal_Account(Account):
         
         return False
     
+    def send_history_via_email(self, email : str):
+        return super().send_history_via_email(email, "Personal")
+    
 class Company_Account(Account):
     def __init__( self, company_name, nip, api = requests):
         res = api.get(BANK_APP_MF_URL+nip+'?date='+datetime.now().strftime('%Y-%m-%d'))
@@ -78,6 +92,9 @@ class Company_Account(Account):
             return super().submit_for_loan(value)
         else:
             return False
+    
+    def send_history_via_email(self, email : str):
+        return super().send_history_via_email(email, 'Company')
         
         
 class AccountRegistry:
