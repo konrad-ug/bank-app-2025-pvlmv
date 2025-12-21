@@ -1,4 +1,5 @@
 from src.account import Account, Company_Account, Personal_Account, AccountRegistry
+from unittest.mock import patch
 import pytest
 
 # python3 -m coverage run --source=src -m pytest ; python3 -m coverage report
@@ -44,18 +45,12 @@ class TestAccount:
         assert acc.company_name == 'company'
         assert acc.nip==expected
        
-    def test_transaction(self):
-        acc = Account()
-        acc.transaction(10,1)
-        assert acc.balance==9
-        assert acc.history[-1] == {"value":10,"cost":1}
-    
     def test_personal_transaction( self, john_doe ):
         john_doe.transaction( 100 )
         assert john_doe.balance==100
         john_doe.transaction( -10, True )
         assert john_doe.balance == 89
-        
+    
     def test_company_transaction( self, betonpol ):
         betonpol.transaction( 100 )
         assert betonpol.balance==100
@@ -87,7 +82,41 @@ class TestAccount:
         betonpol.transaction( -1775 )
         assert betonpol.submit_for_loan( 100 ) == True
         assert betonpol.submit_for_loan( 100000 ) == False
+    
+    def test_email(self):
+        acc = Account()
+        with patch('src.account.SMTPClient.send') as mock_send:
+            mock_send.return_value = True
+            assert acc.send_history_via_email('','') == False
+            assert acc.send_history_via_email('example@example.com','') == True
+            mock_send.assert_called_once()
+            subject, body, email = mock_send.call_args[0]
+            assert 'Account Transfer History' in subject
+            assert ' account history' in body
+            assert email == 'example@example.com'
         
+    def test_personal_email( self, john_doe):
+        with patch('src.account.SMTPClient.send') as mock_send:
+            mock_send.return_value = True
+            assert john_doe.send_history_via_email('not an email') == False
+            assert john_doe.send_history_via_email('example@example.com') == True
+            mock_send.assert_called_once()
+            subject, body, email = mock_send.call_args[0]
+            assert 'Account Transfer History' in subject
+            assert 'Personal account history' in body
+            assert email == 'example@example.com'
+    
+    def test_company_email( self, betonpol):
+        with patch('src.account.SMTPClient.send') as mock_send:
+            mock_send.return_value = True
+            assert betonpol.send_history_via_email('notmail') == False
+            assert betonpol.send_history_via_email('example@example.com') == True
+            mock_send.assert_called_once()
+            subject, body, email = mock_send.call_args[0]
+            assert 'Account Transfer History' in subject
+            assert 'Company account history' in body
+            assert email == 'example@example.com'
+    
     @pytest.mark.parametrize( 'test_input,expected', [ ('6032=======', 50), ( '9901=======', 50 ),('6012=======',0) ])
     def test_personal_promo( self, test_input, expected ):
         assert Personal_Account("John","Doe",test_input,"PROMO_XYZ").balance == expected
@@ -100,4 +129,4 @@ class TestAccount:
         assert reg.find(john_doe.pesel)==john_doe
         assert reg.access() == reg.accounts
         assert reg.size() == len(reg.accounts)
-        
+    
