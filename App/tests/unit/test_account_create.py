@@ -1,6 +1,6 @@
 from src.account import Account, Company_Account, Personal_Account, AccountRegistry
 from unittest.mock import patch
-import pytest
+import pytest, pytest_mock
 
 # python3 -m coverage run --source=src -m pytest ; python3 -m coverage report
 

@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from src.account import AccountRegistry, Personal_Account
+from App.src.account import AccountRegistry, Personal_Account
 
 # python3 -m flask --app app/api.py --debug run
 
