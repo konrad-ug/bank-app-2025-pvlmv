@@ -2,7 +2,9 @@ from functools import reduce
 from datetime import datetime
 from src.smtp.smtp import SMTPClient
 import requests
+
 BANK_APP_MF_URL = 'https://wl-api.mf.gov.pl/api/search/nip/'
+
 class Account:
     def __init__(self):
         self.balance=0
@@ -72,11 +74,11 @@ class Company_Account(Account):
     def __init__( self, company_name, nip, api = requests):
         res = api.get(BANK_APP_MF_URL+nip+'?date='+datetime.now().strftime('%Y-%m-%d'))
         if len(nip) < 10:
-            self.nip='INVALID'        
+            self.nip='INVALID'
         elif res.status_code==200 and res.json()['result']['subject']['statusVat']=='Czynny':
             self.nip=nip
         else:
-            raise ValueError('Company not registered!')
+            raise ValueError('Company not registered!') # pragma: no cover
         self.company_name = company_name
         self.balance = 0
         self.history=[]
